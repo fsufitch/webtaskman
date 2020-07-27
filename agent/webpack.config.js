@@ -41,6 +41,7 @@ let urlLoader = {
 };
 
 const ELECTRON_MAIN = {
+    mode: 'production',
     target: 'electron-main',
     devtool: "none",
     entry: {
@@ -62,7 +63,7 @@ const ELECTRON_MAIN = {
             { test: /\.tsx?$/i, use: [babelLoader, tsLoader] },
             { test: /\.html$/i, use: [htmlLoader] },
             { test: /\.s[ac]ss/i, use: [miniCssExtractLoader, cssModulesTypescriptLoader, cssLoader, sassLoader] },
-            { test: /\.(png|jpe?g|gif)$/i, use: [urlLoader] },
+            { test: /\.(png|jpe?g|gif|ico)$/i, use: [fileLoader] },
         ]
     },
     plugins: [
@@ -74,12 +75,6 @@ const ELECTRON_MAIN = {
         new Dotenv({ systemvars: true }),
     ],
     optimization: {
-        minimizer: [
-            new UglifyJsPlugin({
-                cache: true,
-                sourceMap: true,
-            }),
-        ],
         splitChunks: {
             chunks: 'all',
         },
@@ -87,6 +82,7 @@ const ELECTRON_MAIN = {
 };
 
 const ELECTRON_RENDERER = {
+    mode: 'production',
     target: 'electron-renderer',
     devtool: "inline-source-map",
     entry: {
@@ -124,12 +120,6 @@ const ELECTRON_RENDERER = {
         new Dotenv({ systemvars: true }),
     ],
     optimization: {
-        minimizer: [
-            new UglifyJsPlugin({
-                cache: true,
-                sourceMap: true,
-            }),
-        ],
         splitChunks: {
             chunks: 'all',
         },
