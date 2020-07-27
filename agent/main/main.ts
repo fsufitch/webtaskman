@@ -83,7 +83,7 @@ app.on('ready', () => {
         console.log('tray click');
     });
 
-    ipcMain.on('renderer-ready', event => {
+    ipcMain.once('renderer-ready', event => {
         console.log('received renderer-ready');
         runMonitor(2, data => {
             event.reply('monitor-update', JSON.stringify(data));
