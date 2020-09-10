@@ -1,22 +1,6 @@
 import {cpu, mem, proc} from 'node-os-utils';
-
-export interface MonitorData {
-    cpu: {
-        count: number;
-        averageUsage: number;
-    };
-
-    memory: {
-        total: number;
-        used: number;
-        free: number;
-    };
-
-    proc: {
-        count: string | number;
-        zombie: string | number;
-    }
-}
+import { snapshot } from 'process-list';
+import { MonitorData } from '@webtaskman/common/types';
 
 export const runMonitor = (intrevalSeconds: number, callback: (data: MonitorData) => void) => {
     setInterval(async () => {
@@ -26,7 +10,9 @@ export const runMonitor = (intrevalSeconds: number, callback: (data: MonitorData
             mem.used(),
             proc.totalProcesses(),
             proc.zombieProcesses(),
-        ]).then(([cpuAverageUsage, memFree, memUsed, procTotal, procZombie]) => {
+            snapshot(),
+            
+        ]).then(([cpuAverageUsage, memFree, memUsed, procTotal, procZombie, procs]) => {
             callback({
                 cpu: {
                     count: cpu.count(),
@@ -40,6 +26,7 @@ export const runMonitor = (intrevalSeconds: number, callback: (data: MonitorData
                 proc: {
                     count: procTotal,
                     zombie: procZombie,
+                    procs,
                 },
             });
         });

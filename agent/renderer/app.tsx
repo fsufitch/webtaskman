@@ -3,24 +3,7 @@ import ReactDOM from 'react-dom';
 import {ipcRenderer } from 'electron';
 
 import { CounterButton } from './CounterButton';
-
-export interface MonitorData {
-    cpu: {
-        count: number;
-        averageUsage: number;
-    };
-
-    memory: {
-        total: number;
-        used: number;
-        free: number;
-    };
-
-    proc: {
-        count: string | number;
-        zombie: string | number;
-    }
-}
+import { MonitorData } from '@webtaskman/common/types';
 
 function App() {
     const [monitorData, setMonitorData] = useState<MonitorData | undefined>();

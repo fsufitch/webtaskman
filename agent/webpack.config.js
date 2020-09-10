@@ -39,6 +39,10 @@ let urlLoader = {
         fallback: fileLoader,
     }
 };
+let nodeLoader = {
+    loader: 'node-loader'
+}
+
 
 const ELECTRON_MAIN = {
     mode: 'production',
@@ -53,7 +57,7 @@ const ELECTRON_MAIN = {
     },
     resolve: {
         // Add `.ts` and `.tsx` as a resolvable extension.
-        extensions: [".ts", ".tsx", ".js"],
+        extensions: [".ts", ".tsx", ".js", ".node"],
         plugins: [
             new TsconfigPathsPlugin(),
         ],
@@ -64,6 +68,7 @@ const ELECTRON_MAIN = {
             { test: /\.html$/i, use: [htmlLoader] },
             { test: /\.s[ac]ss/i, use: [miniCssExtractLoader, cssModulesTypescriptLoader, cssLoader, sassLoader] },
             { test: /\.(png|jpe?g|gif|ico)$/i, use: [fileLoader] },
+            { test: /\.node$/i, use: [nodeLoader]},
         ]
     },
     plugins: [
@@ -74,11 +79,11 @@ const ELECTRON_MAIN = {
         }),
         new Dotenv({ systemvars: true }),
     ],
-    optimization: {
-        splitChunks: {
-            chunks: 'all',
-        },
-    },
+    // optimization: {
+    //     splitChunks: {
+    //         chunks: 'all',
+    //     },
+    // },
 };
 
 const ELECTRON_RENDERER = {
