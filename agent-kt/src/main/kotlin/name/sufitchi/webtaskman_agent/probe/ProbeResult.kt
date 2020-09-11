@@ -22,6 +22,13 @@ data class ProbeResult(
             val total: Long,
             val used: Long,
             val free: Long,
+            val shared: Long,
+            val buffers: Long,
+            val cache: Long,
+            val available: Long,
+            val swapTotal: Long,
+            val swapUsed: Long,
+            val swapFree: Long,
     )
 
     @Serializable

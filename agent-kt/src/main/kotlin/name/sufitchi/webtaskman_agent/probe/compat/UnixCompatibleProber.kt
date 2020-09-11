@@ -11,11 +11,24 @@ import java.util.stream.Stream
 import kotlin.streams.toList
 
 class UnixCompatibleProber : OSCompatibleProber {
+    override suspend fun memory(): ProbeResult.Memory =
+            free().run {
+                ProbeResult.Memory(
+                        total = total,
+                        used = used,
+                        free = free,
+                        shared = shared,
+                        buffers = buffers,
+                        cache = cache,
+                        available = available,
+                        swapTotal = swapTotal,
+                        swapUsed = swapUsed,
+                        swapFree = swapFree,
+                )
+            }
 
     override suspend fun load(): ProbeResult.Load =
-            uptime().let {
-                ProbeResult.Load(it.minute1, it.minute5, it.minute15)
-            }
+            uptime().run { ProbeResult.Load(minute1, minute5, minute15) }
 
 
     override suspend fun cpus(): Collection<ProbeResult.CPU> {
@@ -54,13 +67,35 @@ class UnixCompatibleProber : OSCompatibleProber {
 
     }
 
+    private suspend fun free() = withTimeout(5000) {
+        runInterruptible(Dispatchers.IO) { ProcessBuilder("free", "-bw").start().apply { waitFor() } }
+    }
+            .inputStream.bufferedReader().readLines().let { lines ->
+                Pair(
+                        lines[1].split(Regex("\\s+")).map { it.trim() },
+                        lines[2].split(Regex("\\s+")).map { it.trim() },
+                )
+            }
+            .let { (first, second) ->
+                object {
+                    val total = first[1].toLong()
+                    val used = first[2].toLong()
+                    val free = first[3].toLong()
+                    val shared = first[4].toLong()
+                    val buffers = first[5].toLong()
+                    val cache = first[6].toLong()
+                    val available = first[7].toLong()
+                    val swapTotal = second[1].toLong()
+                    val swapUsed = second[2].toLong()
+                    val swapFree = second[3].toLong()
+                }
+            }
+
+
     private suspend fun uptime() = withTimeout(5000) {
-        runInterruptible(Dispatchers.IO) {
-            val proc = ProcessBuilder("uptime").start()
-            proc.waitFor()
-            proc
-        }
-    }.inputStream.bufferedReader().readText().trim()
+        runInterruptible(Dispatchers.IO) { ProcessBuilder("uptime").start().apply { waitFor() } }
+    }
+            .inputStream.bufferedReader().readText().trim()
             .split("load average:")
             .let { parts ->
                 parts[1].split(",")
@@ -75,32 +110,25 @@ class UnixCompatibleProber : OSCompatibleProber {
             }
 
     private suspend fun parseProcCPUInfo(): Stream<CPUInfo> = withContext(Dispatchers.IO) {
-        runInterruptible {
-            val reader = FileReader("/proc/cpuinfo")
-            val text = reader.buffered().readText()
-            reader.close()
-            text
-        }
-    }.split("\n\n").map {
-        it.split("\n")
-                .map { line -> line.split(":", limit = 2) + listOf("", "") }
-                .map { pair -> Pair(pair[0].trim(), pair[1].trim()) }
-                .let { pairList -> mapOf(*pairList.toTypedArray()) }
-    }.map {
-        CPUInfo(
-                id = it["processor"]?.toInt() ?: -1,
-                modelName = it["model name"],
-                mhz = it["cpu MHz"]?.toDouble() ?: -1.0,
-        )
-    }.stream()
+        runInterruptible { FileReader("/proc/cpuinfo").let { f -> f.buffered().readText().also { f.close() } } }
+    }
+            .split("\n\n").map {
+                it.split("\n")
+                        .map { line -> line.split(":", limit = 2) + listOf("", "") }
+                        .map { pair -> Pair(pair[0].trim(), pair[1].trim()) }
+                        .let { pairList -> mapOf(*pairList.toTypedArray()) }
+            }.map {
+                CPUInfo(
+                        id = it["processor"]?.toInt() ?: -1,
+                        modelName = it["model name"],
+                        mhz = it["cpu MHz"]?.toDouble() ?: -1.0,
+                )
+            }.stream()
 
     private suspend fun mpstatAll(): Stream<CPUInfo> = withTimeout(5000) {
-        runInterruptible(Dispatchers.IO) {
-            val proc = ProcessBuilder("mpstat", "-P", "ALL").start()
-            proc.waitFor()
-            proc
-        }
-    }.inputStream.bufferedReader().lines().skip(3)
+        runInterruptible(Dispatchers.IO) { ProcessBuilder("mpstat", "-P", "ALL").start().apply { waitFor() } }
+    }
+            .inputStream.bufferedReader().lines().skip(3)
             .map {
                 it.split(Regex("\\s+"), 14)
                         .map { sub -> sub.trim() }
@@ -117,7 +145,6 @@ class UnixCompatibleProber : OSCompatibleProber {
                     CPUInfo(-1)
                 }
             }
-            .filter { it.id >= 0 }
 
 
     private fun javaProcInfo() = ProcessHandle.allProcesses()
@@ -188,20 +215,16 @@ class UnixCompatibleProber : OSCompatibleProber {
                 }
             }
 
-    private suspend fun runAndParsePidstat(args: List<String>, columns: Int) =
-            withTimeout(5000) {
-                runInterruptible(Dispatchers.IO) {
-                    val proc = ProcessBuilder("pidstat", *args.toTypedArray()).start()
-                    proc.waitFor()
-                    proc
-                }
-            }.inputStream.bufferedReader().lines().skip(3)
-                    .map {
-                        it.split(Regex("\\s+"), columns)
-                                .map { sub -> sub.trim() }
-                                .filter { sub -> sub.isNotEmpty() }
-                    }
-                    .filter { it.size == columns }
+    private suspend fun runAndParsePidstat(args: List<String>, columns: Int) = withTimeout(5000) {
+        runInterruptible(Dispatchers.IO) { ProcessBuilder("pidstat", *args.toTypedArray()).start().apply { waitFor() } }
+    }
+            .inputStream.bufferedReader().lines().skip(3)
+            .map {
+                it.split(Regex("\\s+"), columns)
+                        .map { sub -> sub.trim() }
+                        .filter { sub -> sub.isNotEmpty() }
+            }
+            .filter { it.size == columns }
 
 
     private data class ProcInfo(
