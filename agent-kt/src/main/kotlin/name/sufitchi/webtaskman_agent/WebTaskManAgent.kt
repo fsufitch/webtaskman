@@ -6,19 +6,17 @@ import javafx.scene.Scene
 import javafx.scene.control.Label
 import javafx.scene.layout.StackPane
 import javafx.stage.Stage
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import name.sufitchi.webtaskman_agent.probe.SystemProber
 
 class WebTaskManAgent {
     companion object {
         @JvmStatic
         fun main(vararg args: String) {
-            println("hello world")
-
-            ProcessHandle.allProcesses()
-                    .forEach {
-                        println("${it.pid()} - ${it.info().user().orElse("<nil>")} - ${it.info().command().orElse("<nil>")} - ${it.info().commandLine().orElse("<nil>")}")
-                    }
-
-            Application.launch(JFXApplication::class.java, *args)
+            val result = Json.encodeToString(SystemProber().probe())
+            println(result)
+                //Application.launch(JFXApplication::class.java, *args)
         }
     }
 
