@@ -7,14 +7,18 @@ application {
 plugins {
     application
     kotlin("jvm") version "1.4.10"
+    id("org.openjfx.javafxplugin") version "0.0.9"
 }
 
 repositories {
     mavenCentral()
 }
 
+javafx {
+    version = "14"
+    modules( "javafx.controls" )
+}
 
 tasks.withType<KotlinCompile>().configureEach {
-    //kotlinOptions.suppressWarnings = true
     kotlinOptions.jvmTarget = "1.8"
 }
