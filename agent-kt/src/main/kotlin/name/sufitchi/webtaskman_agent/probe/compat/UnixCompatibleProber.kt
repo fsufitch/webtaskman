@@ -178,7 +178,7 @@ class UnixCompatibleProber : OSCompatibleProber {
                     ProcInfo(
                             pid = it[3].toLong(),
                             uid = it[2].toLong(),
-                            memoryBytes = it[7].toLong(),
+                            memoryBytes = it[7].toLong() * 1000,
                             name = it[9].trim(),
                     )
                 } catch (e: Exception) {
