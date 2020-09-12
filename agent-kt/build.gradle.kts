@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 application {
+    applicationName = "webtaskman-agent"
     mainClassName = "name.sufitchi.webtaskman_agent.WebTaskManAgent"
 }
 
@@ -9,6 +10,7 @@ dependencies {
     implementation("com.dorkbox", "SystemTray", "3.17")
     implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.3.9")
     implementation("org.jetbrains.kotlinx", "kotlinx-serialization-core", "1.0.0-RC")
+    implementation("commons-cli", "commons-cli", "1.4")
 }
 
 plugins {

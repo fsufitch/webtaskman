@@ -1,4 +1,4 @@
-package name.sufitchi.webtaskman_agent
+package name.sufitchi.webtaskman_agent.gui
 
 import dorkbox.systemTray.SystemTray
 import javafx.stage.Stage

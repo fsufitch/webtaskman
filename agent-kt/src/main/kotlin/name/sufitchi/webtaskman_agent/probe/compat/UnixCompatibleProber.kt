@@ -152,9 +152,9 @@ class UnixCompatibleProber : OSCompatibleProber {
                 ProcInfo(
                         proc.pid(),
                         parentPID = proc.parent().unwrap()?.pid(),
-                        path = proc.info().command().unwrap(),
-                        cmdline = proc.info().commandLine().unwrap(),
-                        owner = proc.info().user().unwrap(),
+                        path = proc.info().command().unwrap()?.trim(),
+                        cmdline = proc.info().commandLine().unwrap()?.trim(),
+                        owner = proc.info().user().unwrap()?.trim(),
                 )
             }
 
