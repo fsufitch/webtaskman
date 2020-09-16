@@ -1,0 +1,11 @@
+module wtagent {
+    requires kotlin.stdlib;
+    requires kotlin.stdlib.jdk8;
+    requires java.desktop;
+    requires javafx.graphics;
+    requires javafx.controls;
+
+    exports name.sufitchi.webtaskman_agent;
+    exports name.sufitchi.webtaskman_agent.gui;
+    exports name.sufitchi.webtaskman_agent.cli;
+}

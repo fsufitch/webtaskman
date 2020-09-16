@@ -15,7 +15,7 @@ class TrayIcon(private val stage: Stage) {
 
     fun start() {
         println("wat")
-        SystemTray.FORCE_GTK2 = true
+        SystemTray.DEBUG = true
         val tray = SystemTray.get()
         tray.setImage(icon)
 
@@ -24,6 +24,7 @@ class TrayIcon(private val stage: Stage) {
         tray.menu.add(JSeparator())
         tray.menu.add(JMenuItem("entry 2"))
 
+        showStage()
         println("ok")
     }
 

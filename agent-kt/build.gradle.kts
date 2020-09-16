@@ -11,7 +11,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx", "kotlinx-coroutines-core", "1.3.9")
     implementation("org.jetbrains.kotlinx", "kotlinx-serialization-core", "1.0.0-RC")
     implementation("commons-cli", "commons-cli", "1.4")
+    implementation("org.jetbrains.kotlin", "kotlin-stdlib-jdk8", "1.4.10")
 }
+
 
 plugins {
     application
@@ -30,5 +32,5 @@ javafx {
 }
 
 tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "11"
 }

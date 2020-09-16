@@ -21,6 +21,6 @@ class GUI : Application() {
         stage.scene = scene
         stage.show()
 
-        //TrayIcon(stage).start()
+        TrayIcon(stage).start()
     }
 }
