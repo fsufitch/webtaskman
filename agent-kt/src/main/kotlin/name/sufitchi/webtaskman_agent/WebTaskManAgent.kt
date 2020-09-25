@@ -1,17 +1,20 @@
 package name.sufitchi.webtaskman_agent
 
 import name.sufitchi.webtaskman_agent.cli.CLI
+import name.sufitchi.webtaskman_agent.common.config.Configuration
 import name.sufitchi.webtaskman_agent.gui.GUI
 
 class WebTaskManAgent {
     companion object {
         @JvmStatic
         fun main(vararg args: String) {
-            CLI(*args).run {
+            Configuration.Mux(
+                    Configuration.Environment(),
+                    Configuration.Varargs.parse(*args),
+            ).run {
                 when {
-                    help() -> printHelp()
-                    gui() -> GUI.launch(*args)
-                    else -> start()
+                    cli() -> CLI(this).start()
+                    else -> GUI.launch(*args)
                 }
             }
         }
